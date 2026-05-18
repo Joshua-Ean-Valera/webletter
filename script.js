@@ -1,5 +1,5 @@
 const supabaseUrl = 'https://gopyozosqfnuhstkvppt.supabase.co'
-const supabaseKey = 'sb_publishable_o1IWjQenlJmHvmduHjt61A_sn5QgLY_'
+const supabaseKey = 'sb_publishable_o1IWjQenlJmHvmduHjt6eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvcHlvem9zcWZudWhzdGt2cHB0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTEwMjcwOSwiZXhwIjoyMDk0Njc4NzA5fQ.x-0wmLPbv0MqROWeBi4l7kWwtQKJ5779UZjOmSCFIDQ1A_sn5QgLY_'
 
 const client = supabase.createClient(
   supabaseUrl,
