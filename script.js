@@ -1,15 +1,43 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  collection,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 /* =========================
-   SUPABASE CONFIG
+   FIREBASE CONFIG
 ========================= */
 
-const supabaseUrl = 'https://gopyozosqfnuhstkvppt.supabase.co';
+const firebaseConfig = {
+  apiKey: "AIzaSyChlPz19QeeImmQSt4oWdAluD6XbWch8g",
+  authDomain: "webletter-7f64a.firebaseapp.com",
+  databaseURL: "https://webletter-7f64a-default-rtdb.firebaseio.com",
+  projectId: "webletter-7f64a",
+  storageBucket: "webletter-7f64a.firebasestorage.app",
+  messagingSenderId: "316842154834",
+  appId: "1:316842154834:web:e88b9335861ca97f8f388b"
+};
 
-/* ⚠️ RECOMMENDED: replace this with your ANON PUBLIC KEY from Supabase Dashboard */
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvcHlvem9zcWZudWhzdGt2cHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMDI3MDksImV4cCI6MjA5NDY3ODcwOX0.pKWknjshOndcnihJJ0yvCYZx5KuIdc4EdJn5gEx6Cp8';
+/* =========================
+   INIT
+========================= */
 
-const client = createClient(supabaseUrl, supabaseKey);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 /* =========================
    LOGIN
@@ -20,33 +48,30 @@ async function login() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
-  const { error } = await client.auth.signInWithPassword({
-    email,
-    password
-  });
+  try {
 
-  if (error) {
+    await signInWithEmailAndPassword(auth, email, password);
+
+    const userRef = doc(db, "users", email);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      alert("User not found in database");
+      return;
+    }
+
+    const role = userSnap.data().role;
+
+    localStorage.setItem("email", email);
+
+    if (role === "admin") {
+      window.location.href = "admin.html";
+    } else {
+      window.location.href = "teacher.html";
+    }
+
+  } catch (error) {
     alert(error.message);
-    return;
-  }
-
-  const { data: userData, error: fetchError } = await client
-    .from('users')
-    .select('*')
-    .eq('email', email)
-    .single();
-
-  if (fetchError) {
-    alert(fetchError.message);
-    return;
-  }
-
-  localStorage.setItem('email', email);
-
-  if (userData.role === 'admin') {
-    window.location.href = 'admin.html';
-  } else {
-    window.location.href = 'teacher.html';
   }
 }
 
@@ -55,35 +80,31 @@ async function login() {
 ========================= */
 
 async function logout() {
-  await client.auth.signOut();
+  await signOut(auth);
   localStorage.clear();
-  window.location.href = 'index.html';
+  window.location.href = "index.html";
 }
 
 /* =========================
-   LOAD TEACHERS
+   LOAD TEACHERS (ADMIN)
 ========================= */
 
 async function loadTeachers() {
 
-  const { data, error } = await client
-    .from('users')
-    .select('*')
-    .eq('role', 'teacher');
+  const snapshot = await getDocs(collection(db, "users"));
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
+  const select = document.getElementById("teacherSelect");
+  select.innerHTML = "";
 
-  const select = document.getElementById('teacherSelect');
-  select.innerHTML = '';
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
 
-  data.forEach(user => {
-    const option = document.createElement('option');
-    option.value = user.email;
-    option.textContent = user.email;
-    select.appendChild(option);
+    if (data.role === "teacher") {
+      const option = document.createElement("option");
+      option.value = data.email;
+      option.textContent = data.email;
+      select.appendChild(option);
+    }
   });
 
   loadSelectedTeacherMessage();
@@ -95,77 +116,69 @@ async function loadTeachers() {
 
 async function addTeacher() {
 
-  const email = document.getElementById('newTeacherEmail').value;
-  const password = document.getElementById('newTeacherPassword').value;
+  const email = document.getElementById("newTeacherEmail").value;
+  const password = document.getElementById("newTeacherPassword").value;
 
-  const { error } = await client.auth.signUp({
-    email,
-    password
-  });
+  try {
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
+    await createUserWithEmailAndPassword(auth, email, password);
 
-  await client.from('users').insert([
-    {
-      email: email,
-      role: 'teacher'
-    }
-  ]);
+    await setDoc(doc(db, "users", email), {
+      email,
+      role: "teacher"
+    });
 
-  await client.from('messages').insert([
-    {
+    await setDoc(doc(db, "messages", email), {
       teacher_email: email,
-      message: 'No message yet.'
-    }
-  ]);
+      message: "No message yet."
+    });
 
-  alert('Teacher Added Successfully!');
+    alert("Teacher added successfully!");
 
-  loadTeachers();
+    loadTeachers();
+
+  } catch (error) {
+    alert(error.message);
+  }
 }
 
 /* =========================
-   LOAD SELECTED MESSAGE
+   LOAD SELECTED MESSAGE (ADMIN)
 ========================= */
 
 async function loadSelectedTeacherMessage() {
 
-  const teacherEmail = document.getElementById('teacherSelect').value;
+  const teacherEmail = document.getElementById("teacherSelect").value;
 
-  const { data, error } = await client
-    .from('messages')
-    .select('*')
-    .eq('teacher_email', teacherEmail)
-    .single();
+  if (!teacherEmail) return;
 
-  if (error) return;
+  const snap = await getDoc(doc(db, "messages", teacherEmail));
 
-  if (data) {
-    document.getElementById('messageInput').value = data.message;
+  if (snap.exists()) {
+    document.getElementById("messageInput").value =
+      snap.data().message;
   }
 }
 
 /* =========================
-   UPDATE MESSAGE
+   UPDATE MESSAGE (ADMIN)
 ========================= */
 
 async function updateMessage() {
 
-  const teacherEmail = document.getElementById('teacherSelect').value;
-  const message = document.getElementById('messageInput').value;
+  const teacherEmail = document.getElementById("teacherSelect").value;
+  const message = document.getElementById("messageInput").value;
 
-  const { error } = await client
-    .from('messages')
-    .update({ message })
-    .eq('teacher_email', teacherEmail);
+  try {
 
-  if (error) {
+    await updateDoc(doc(db, "messages", teacherEmail), {
+      message
+    });
+
+    alert("Message updated!");
+
+  } catch (error) {
     alert(error.message);
-  } else {
-    alert('Message Updated!');
   }
 }
 
@@ -175,19 +188,26 @@ async function updateMessage() {
 
 async function loadTeacherMessage() {
 
-  const email = localStorage.getItem('email');
+  const email = localStorage.getItem("email");
 
-  document.getElementById('teacherEmail').innerHTML = email;
+  document.getElementById("teacherEmail").innerText = email;
 
-  const { data, error } = await client
-    .from('messages')
-    .select('*')
-    .eq('teacher_email', email)
-    .single();
+  const snap = await getDoc(doc(db, "messages", email));
 
-  if (error) return;
-
-  if (data) {
-    document.getElementById('teacherMessage').innerHTML = data.message;
+  if (snap.exists()) {
+    document.getElementById("teacherMessage").innerText =
+      snap.data().message;
   }
 }
+
+/* =========================
+   GLOBAL FUNCTIONS (IMPORTANT)
+========================= */
+
+window.login = login;
+window.logout = logout;
+window.loadTeachers = loadTeachers;
+window.addTeacher = addTeacher;
+window.loadSelectedTeacherMessage = loadSelectedTeacherMessage;
+window.updateMessage = updateMessage;
+window.loadTeacherMessage = loadTeacherMessage;
