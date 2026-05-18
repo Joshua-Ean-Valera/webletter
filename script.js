@@ -1,47 +1,52 @@
-const supabaseUrl = 'https://gopyozosqfnuhstkvppt.supabase.co';
-const supabaseKey = 'sb_publishable_o1IWjQenlJmHvmduHjt6eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvcHlvem9zcWZudWhzdGt2cHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMDI3MDksImV4cCI6MjA5NDY3ODcwOX0.pKWknjshOndcnihJJ0yvCYZx5KuIdc4EdJn5gEx6Cp81A_sn5QgLY_';
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-const client = supabase.createClient(
-  supabaseUrl,
-  supabaseKey
-)
+/* =========================
+   SUPABASE CONFIG
+========================= */
+
+const supabaseUrl = 'https://gopyozosqfnuhstkvppt.supabase.co';
+
+/* ⚠️ RECOMMENDED: replace this with your ANON PUBLIC KEY from Supabase Dashboard */
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvcHlvem9zcWZudWhzdGt2cHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMDI3MDksImV4cCI6MjA5NDY3ODcwOX0.pKWknjshOndcnihJJ0yvCYZx5KuIdc4EdJn5gEx6Cp8';
+
+const client = createClient(supabaseUrl, supabaseKey);
 
 /* =========================
    LOGIN
 ========================= */
 
-async function login(){
+async function login() {
 
-  const email =
-    document.getElementById('email').value
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
 
-  const password =
-    document.getElementById('password').value
+  const { error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
 
-  const { error } =
-    await client.auth.signInWithPassword({
-      email,
-      password
-    })
-
-  if(error){
-    alert(error.message)
-    return
+  if (error) {
+    alert(error.message);
+    return;
   }
 
-  const { data:userData } =
-    await client
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single()
+  const { data: userData, error: fetchError } = await client
+    .from('users')
+    .select('*')
+    .eq('email', email)
+    .single();
 
-  localStorage.setItem('email', email)
+  if (fetchError) {
+    alert(fetchError.message);
+    return;
+  }
 
-  if(userData.role === 'admin'){
-    window.location.href = 'admin.html'
+  localStorage.setItem('email', email);
+
+  if (userData.role === 'admin') {
+    window.location.href = 'admin.html';
   } else {
-    window.location.href = 'teacher.html'
+    window.location.href = 'teacher.html';
   }
 }
 
@@ -49,113 +54,97 @@ async function login(){
    LOGOUT
 ========================= */
 
-async function logout(){
-
-  await client.auth.signOut()
-
-  localStorage.clear()
-
-  window.location.href = 'index.html'
+async function logout() {
+  await client.auth.signOut();
+  localStorage.clear();
+  window.location.href = 'index.html';
 }
 
 /* =========================
    LOAD TEACHERS
 ========================= */
 
-async function loadTeachers(){
+async function loadTeachers() {
 
-  const { data } =
-    await client
-      .from('users')
-      .select('*')
-      .eq('role', 'teacher')
+  const { data, error } = await client
+    .from('users')
+    .select('*')
+    .eq('role', 'teacher');
 
-  const select =
-    document.getElementById('teacherSelect')
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
-  select.innerHTML = ''
+  const select = document.getElementById('teacherSelect');
+  select.innerHTML = '';
 
   data.forEach(user => {
+    const option = document.createElement('option');
+    option.value = user.email;
+    option.textContent = user.email;
+    select.appendChild(option);
+  });
 
-    const option =
-      document.createElement('option')
-
-    option.value = user.email
-    option.textContent = user.email
-
-    select.appendChild(option)
-  })
-
-  loadSelectedTeacherMessage()
+  loadSelectedTeacherMessage();
 }
 
 /* =========================
    ADD TEACHER
 ========================= */
 
-async function addTeacher(){
+async function addTeacher() {
 
-  const email =
-    document.getElementById('newTeacherEmail').value
+  const email = document.getElementById('newTeacherEmail').value;
+  const password = document.getElementById('newTeacherPassword').value;
 
-  const password =
-    document.getElementById('newTeacherPassword').value
+  const { error } = await client.auth.signUp({
+    email,
+    password
+  });
 
-  const { error } =
-    await client.auth.signUp({
-      email,
-      password
-    })
-
-  if(error){
-    alert(error.message)
-    return
+  if (error) {
+    alert(error.message);
+    return;
   }
 
-  await client
-    .from('users')
-    .insert([
-      {
-        email: email,
-        role: 'teacher'
-      }
-    ])
+  await client.from('users').insert([
+    {
+      email: email,
+      role: 'teacher'
+    }
+  ]);
 
-  await client
-    .from('messages')
-    .insert([
-      {
-        teacher_email: email,
-        message: 'No message yet.'
-      }
-    ])
+  await client.from('messages').insert([
+    {
+      teacher_email: email,
+      message: 'No message yet.'
+    }
+  ]);
 
-  alert('Teacher Added Successfully!')
+  alert('Teacher Added Successfully!');
 
-  loadTeachers()
+  loadTeachers();
 }
 
 /* =========================
    LOAD SELECTED MESSAGE
 ========================= */
 
-async function loadSelectedTeacherMessage(){
+async function loadSelectedTeacherMessage() {
 
-  const teacherEmail =
-    document.getElementById('teacherSelect').value
+  const teacherEmail = document.getElementById('teacherSelect').value;
 
-  const { data } =
-    await client
-      .from('messages')
-      .select('*')
-      .eq('teacher_email', teacherEmail)
-      .single()
+  const { data, error } = await client
+    .from('messages')
+    .select('*')
+    .eq('teacher_email', teacherEmail)
+    .single();
 
-  if(data){
+  if (error) return;
 
-    document.getElementById(
-      'messageInput'
-    ).value = data.message
+  if (data) {
+    document.getElementById('messageInput').value = data.message;
   }
 }
 
@@ -163,26 +152,20 @@ async function loadSelectedTeacherMessage(){
    UPDATE MESSAGE
 ========================= */
 
-async function updateMessage(){
+async function updateMessage() {
 
-  const teacherEmail =
-    document.getElementById('teacherSelect').value
+  const teacherEmail = document.getElementById('teacherSelect').value;
+  const message = document.getElementById('messageInput').value;
 
-  const message =
-    document.getElementById('messageInput').value
+  const { error } = await client
+    .from('messages')
+    .update({ message })
+    .eq('teacher_email', teacherEmail);
 
-  const { error } =
-    await client
-      .from('messages')
-      .update({
-        message: message
-      })
-      .eq('teacher_email', teacherEmail)
-
-  if(error){
-    alert(error.message)
-  }else{
-    alert('Message Updated!')
+  if (error) {
+    alert(error.message);
+  } else {
+    alert('Message Updated!');
   }
 }
 
@@ -190,26 +173,21 @@ async function updateMessage(){
    TEACHER VIEW
 ========================= */
 
-async function loadTeacherMessage(){
+async function loadTeacherMessage() {
 
-  const email =
-    localStorage.getItem('email')
+  const email = localStorage.getItem('email');
 
-  document.getElementById(
-    'teacherEmail'
-  ).innerHTML = email
+  document.getElementById('teacherEmail').innerHTML = email;
 
-  const { data } =
-    await client
-      .from('messages')
-      .select('*')
-      .eq('teacher_email', email)
-      .single()
+  const { data, error } = await client
+    .from('messages')
+    .select('*')
+    .eq('teacher_email', email)
+    .single();
 
-  if(data){
+  if (error) return;
 
-    document.getElementById(
-      'teacherMessage'
-    ).innerHTML = data.message
+  if (data) {
+    document.getElementById('teacherMessage').innerHTML = data.message;
   }
 }
