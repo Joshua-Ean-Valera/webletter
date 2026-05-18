@@ -1,3 +1,6 @@
+console.log("SCRIPT IS LOADED");
+alert("SCRIPT LOADED");
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
 import {
