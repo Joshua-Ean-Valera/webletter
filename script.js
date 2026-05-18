@@ -22,7 +22,7 @@ import {
 ========================= */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyChlPz19QeeImmQSt4oWdAluD6XbWch8g",
+  apiKey: "AIzaSyChlqPz19QeeImmQSt4oWdAluD6XbWch8g",
   authDomain: "webletter-7f64a.firebaseapp.com",
   databaseURL: "https://webletter-7f64a-default-rtdb.firebaseio.com",
   projectId: "webletter-7f64a",
