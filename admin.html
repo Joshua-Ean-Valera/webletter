@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="loadTeachers()">
+
+<div class="container">
+
+  <h1>Admin Dashboard</h1>
+
+  <button onclick="logout()">
+    Logout
+  </button>
+
+  <hr>
+
+  <h2>Add Teacher</h2>
+
+  <input
+    type="email"
+    id="newTeacherEmail"
+    placeholder="Teacher Email"
+  >
+
+  <input
+    type="password"
+    id="newTeacherPassword"
+    placeholder="Teacher Password"
+  >
+
+  <button onclick="addTeacher()">
+    Add Teacher
+  </button>
+
+  <hr>
+
+  <h2>Edit Teacher Message</h2>
+
+  <select
+    id="teacherSelect"
+    onchange="loadSelectedTeacherMessage()"
+  ></select>
+
+  <textarea
+    id="messageInput"
+    rows="8"
+    placeholder="Edit message here"
+  ></textarea>
+
+  <button onclick="updateMessage()">
+    Save Changes
+  </button>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

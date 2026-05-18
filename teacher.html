@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="loadTeacherMessage()">
+
+<div class="container">
+
+  <h1>Teacher Dashboard</h1>
+
+  <button onclick="logout()">
+    Logout
+  </button>
+
+  <hr>
+
+  <h3 id="teacherEmail"></h3>
+
+  <div id="teacherMessage"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
