@@ -1,4 +1,4 @@
-const supabaseUrl = 'https://gopyozosqfnuhstkvppt.supabase.co/rest/v1/'
+const supabaseUrl = 'https://gopyozosqfnuhstkvppt.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvcHlvem9zcWZudWhzdGt2cHB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMDI3MDksImV4cCI6MjA5NDY3ODcwOX0.pKWknjshOndcnihJJ0yvCYZx5KuIdc4EdJn5gEx6Cp8'
 
 const client = supabase.createClient(
