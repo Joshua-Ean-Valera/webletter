@@ -1,70 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body onload="loadTeachers()">
+<body class="admin-page" onload="loadAdmin()">
 
-<div class="container">
+  <main class="admin-shell">
+    <header class="dashboard-header">
+      <div class="brand">
+        <div class="brand__dot"></div>
+        <span class="brand__name">Admin Dashboard</span>
+      </div>
+      <button class="btn btn-ghost" onclick="logout()">Logout</button>
+    </header>
 
-  <h1>Admin Dashboard</h1>
-  <p style="text-align:center;margin-top:-8px;color:#4a5568;">Admin: <strong>Joshua Ean</strong></p>
+    <section class="glass-card admin-card">
+      <div class="admin-toolbar">
+        <div>
+          <h1 class="dashboard-title">Manage Messages</h1>
+          <p class="dashboard-meta">Add, update, or remove personalized messages.</p>
+        </div>
+        <label class="field field--search">
+          <span>Search</span>
+          <input id="adminSearch" type="text" placeholder="Search by name" oninput="filterUsers()">
+        </label>
+      </div>
 
-  <button onclick="logout()">
-    Logout
-  </button>
+      <div class="admin-grid">
+        <div class="admin-list">
+          <div id="userList" class="list" aria-live="polite"></div>
+        </div>
 
-  <hr>
+        <form class="admin-form" onsubmit="saveUser(); return false;">
+          <h2 class="section-title">User Details</h2>
 
-  <h2>Add Teacher</h2>
+          <label class="field">
+            <span>Name (document id)</span>
+            <input id="adminName" type="text" placeholder="allan">
+          </label>
 
-  <input
-    type="email"
-    id="newTeacherEmail"
-    placeholder="Teacher Email"
-  >
+          <label class="field">
+            <span>Display name</span>
+            <input id="adminDisplayName" type="text" placeholder="Allan">
+          </label>
 
-  <input
-    type="text"
-    id="newTeacherName"
-    placeholder="Teacher Display Name"
-  >
+          <label class="field">
+            <span>Message</span>
+            <textarea id="adminMessage" rows="5" placeholder="Hello Allan, thank you for everything."></textarea>
+          </label>
 
-  <input
-    type="password"
-    id="newTeacherPassword"
-    placeholder="Teacher Password"
-  >
+          <label class="field">
+            <span>Image URL</span>
+            <input id="adminImage" type="url" placeholder="https://example.com/photo.jpg">
+          </label>
 
-  <button onclick="addTeacher()">
-    Add Teacher
-  </button>
+          <div class="field-row">
+            <label class="field">
+              <span>Adviser</span>
+              <input id="adminAdviser" type="text" placeholder="Maam Kaela">
+            </label>
+            <label class="field">
+              <span>Section</span>
+              <input id="adminSection" type="text" placeholder="BSIT 3A">
+            </label>
+          </div>
 
-  <hr>
+          <div class="button-row">
+            <button class="btn btn-primary" type="submit">Save User</button>
+            <button class="btn btn-ghost" type="button" onclick="clearAdminForm()">Clear</button>
+            <button class="btn btn-danger" type="button" onclick="deleteUser()">Delete</button>
+          </div>
 
-  <h2>Edit Teacher Message</h2>
+          <p id="adminStatus" class="form-status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
 
-  <select
-    id="teacherSelect"
-    onchange="loadSelectedTeacherMessage()"
-  ></select>
+  <div id="adminLoader" class="loader" aria-hidden="true">
+    <span class="spinner"></span>
+  </div>
 
-  <textarea
-    id="messageInput"
-    rows="8"
-    placeholder="Edit message here"
-  ></textarea>
-
-  <button onclick="updateMessage()">
-    Save Changes
-  </button>
-
-</div>
-
-<!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script> -->
-<script type="module" src="script.js"></script>
+  <script type="module" src="script.js"></script>
 
 </body>
 </html>

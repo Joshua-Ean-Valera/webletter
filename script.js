@@ -1,285 +1,258 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-
 import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
-import {
-  getFirestore,
+  collection,
+  deleteDoc,
   doc,
-  setDoc,
   getDoc,
   getDocs,
-  collection,
-  updateDoc
+  getFirestore,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { firebaseConfig } from "./config.js";
 
-/* =========================
-   FIREBASE CONFIG
-========================= */
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyChlqPz19QeeImmQSt4oWdAluD6XbWch8g",
-  authDomain: "webletter-7f64a.firebaseapp.com",
-  databaseURL: "https://webletter-7f64a-default-rtdb.firebaseio.com",
-  projectId: "webletter-7f64a",
-  storageBucket: "webletter-7f64a.firebasestorage.app",
-  messagingSenderId: "316842154834",
-  appId: "1:316842154834:web:e88b9335861ca97f8f388b"
-};
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
-const adminDisplayName = "Joshua Ean";
+const SESSION_KEY = "pm_username";
 
-/* =========================
-   LOGIN
-========================= */
+let adminUsers = [];
+let adminSelectedId = null;
 
-async function login() {
-
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  try {
-
-    await signInWithEmailAndPassword(auth, email, password);
-
-    const userRef = doc(db, "users", email);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      alert("User not found in database");
-      return;
-    }
-
-    const role = userSnap.data().role;
-
-    localStorage.setItem("email", email);
-
-    if (role === "admin") {
-      window.location.href = "admin.html";
-    } else {
-      window.location.href = "teacher.html";
-    }
-
-  } catch (error) {
-    alert(error.message);
-  }
+function byId(id) {
+  return document.getElementById(id);
 }
 
-/* =========================
-   LOGOUT
-========================= */
-
-async function logout() {
-  await signOut(auth);
-  localStorage.clear();
-  window.location.href = "index.html";
+function normalizeName(value) {
+  return value.trim().toLowerCase();
 }
 
-/* =========================
-   LOAD TEACHERS (ADMIN)
-========================= */
-
-async function loadTeachers() {
-
-  const snapshot = await getDocs(collection(db, "users"));
-
-  const select = document.getElementById("teacherSelect");
-  select.innerHTML = "";
-
-  snapshot.forEach((docSnap) => {
-    const data = docSnap.data();
-
-    if (data.role === "teacher") {
-      const option = document.createElement("option");
-      option.value = data.email;
-      option.textContent = data.name || data.email;
-      select.appendChild(option);
-    }
-  });
-
-  loadSelectedTeacherMessage();
+function showStatus(elementId, message, isError) {
+  const el = byId(elementId);
+  if (!el) return;
+  el.textContent = message;
+  el.classList.toggle("is-error", Boolean(isError));
 }
 
-/* =========================
-   ADD TEACHER
-========================= */
-
-async function addTeacher() {
-
-  const email = document.getElementById("newTeacherEmail").value;
-  const name = document.getElementById("newTeacherName").value;
-  const password = document.getElementById("newTeacherPassword").value;
-
-  try {
-
-    await createUserWithEmailAndPassword(auth, email, password);
-
-    await setDoc(doc(db, "users", email), {
-      email,
-      name,
-      role: "teacher"
-    });
-
-    await setDoc(doc(db, "messages", email), {
-      teacher_email: email,
-      teacher_name: name,
-      admin_name: adminDisplayName,
-      message: "No message yet."
-    });
-
-    alert("Teacher added successfully!");
-
-    loadTeachers();
-
-  } catch (error) {
-    alert(error.message);
-  }
+function setLoader(id, isVisible) {
+  const el = byId(id);
+  if (!el) return;
+  el.style.display = isVisible ? "flex" : "none";
 }
 
-/* =========================
-   LOAD SELECTED MESSAGE (ADMIN)
-========================= */
+async function loginByName() {
+  const nameInput = byId("loginName");
+  if (!nameInput) return;
+  const rawName = nameInput.value;
+  const normalized = normalizeName(rawName);
 
-async function loadSelectedTeacherMessage() {
-
-  const teacherEmail = document.getElementById("teacherSelect").value;
-
-  if (!teacherEmail) return;
-
-  const snap = await getDoc(doc(db, "messages", teacherEmail));
-
-  if (snap.exists()) {
-    document.getElementById("messageInput").value =
-      snap.data().message;
-  }
-}
-
-/* =========================
-   UPDATE MESSAGE (ADMIN)
-========================= */
-
-async function updateMessage() {
-
-  const teacherEmail = document.getElementById("teacherSelect").value;
-  const message = document.getElementById("messageInput").value;
-
-  try {
-
-    await updateDoc(doc(db, "messages", teacherEmail), {
-      message
-    });
-
-    alert("Message updated!");
-
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
-/* =========================
-   TEACHER VIEW
-========================= */
-
-async function loadTeacherMessage() {
-
-  const email = localStorage.getItem("email");
-
-  const senderNameEl = document.getElementById("senderName");
-
-  const teacherDateEl = document.getElementById("teacherDate");
-  if (teacherDateEl) {
-    teacherDateEl.innerText = new Date().toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric"
-    });
-  }
-
-  const snap = await getDoc(doc(db, "messages", email));
-  const userSnap = await getDoc(doc(db, "users", email));
-
-  const teacherName = userSnap.exists() && userSnap.data().name
-    ? userSnap.data().name
-    : email;
-
-  const senderName = snap.exists() && snap.data().admin_name
-    ? snap.data().admin_name
-    : adminDisplayName;
-
-  if (senderNameEl) {
-    senderNameEl.innerText = senderName;
-  }
-
-  if (snap.exists()) {
-    const msg = snap.data().message || "";
-    const el = document.getElementById("teacherMessage");
-    if (el) {
-      el.innerText = "Dear " + (teacherName || "Teacher") + ",\n\n" + msg + "\n\nSincerely,\n" + senderName;
-    }
-  }
-}
-
-function openEnvelope(){
-  const env = document.getElementById('envelope');
-  const btn = document.getElementById('openBtn');
-  if (!env) return;
-  if (env.classList.contains('open')) {
-    env.classList.remove('open');
-    if (btn) btn.textContent = 'Open Letter';
+  if (!normalized) {
+    showStatus("loginStatus", "Please enter your name.", true);
     return;
   }
 
-  env.classList.add('open');
-  if (btn) btn.textContent = 'Close Letter';
+  showStatus("loginStatus", "Checking your message...", false);
+  setLoader("authLoader", true);
+
+  try {
+    const userSnap = await getDoc(doc(db, "users", normalized));
+    if (!userSnap.exists()) {
+      showStatus("loginStatus", "No personalized message found.", true);
+      setLoader("authLoader", false);
+      return;
+    }
+
+    localStorage.setItem(SESSION_KEY, normalized);
+    localStorage.setItem("pm_displayName", userSnap.data().name || rawName.trim());
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    showStatus("loginStatus", error.message, true);
+  } finally {
+    setLoader("authLoader", false);
+  }
 }
 
-function closeEnvelope(){
-  const env = document.getElementById('envelope');
-  const btn = document.getElementById('openBtn');
-  if (!env) return;
-  env.classList.remove('open');
-  if (btn) btn.textContent = 'Open Letter';
+function logout() {
+  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem("pm_displayName");
+  window.location.href = "index.html";
 }
 
-function downloadLetter(){
-  const senderName = document.getElementById("senderName")?.innerText || adminDisplayName;
-  const teacherDate = document.getElementById("teacherDate")?.innerText || "";
-  const letter = document.getElementById("teacherMessage")?.innerText || "";
-  const blob = new Blob([
-    "Appreciation Letter\n\n",
-    "From: ", senderName, "\n",
-    "Date: ", teacherDate, "\n\n",
-    letter, "\n"
-  ], { type: "text/plain;charset=utf-8" });
+async function loadDashboard() {
+  const userId = localStorage.getItem(SESSION_KEY);
+  if (!userId) {
+    window.location.href = "index.html";
+    return;
+  }
 
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "appreciation-letter.txt";
-  a.click();
-  URL.revokeObjectURL(url);
+  setLoader("dashboardLoader", true);
+  showStatus("dashboardStatus", "", false);
+
+  try {
+    const snap = await getDoc(doc(db, "users", userId));
+    if (!snap.exists()) {
+      showStatus("dashboardStatus", "No personalized message found.", true);
+      return;
+    }
+
+    const data = snap.data();
+    const displayName = data.name || localStorage.getItem("pm_displayName") || userId;
+
+    const welcomeName = byId("welcomeName");
+    if (welcomeName) welcomeName.textContent = displayName;
+
+    const welcomeMeta = byId("welcomeMeta");
+    if (welcomeMeta) welcomeMeta.textContent = data.section ? data.section : "";
+
+    const messageText = byId("messageText");
+    if (messageText) messageText.textContent = data.message || "";
+
+    const adviserText = byId("adviserText");
+    if (adviserText) adviserText.textContent = data.adviser || "-";
+
+    const sectionText = byId("sectionText");
+    if (sectionText) sectionText.textContent = data.section || "-";
+
+    const imageEl = byId("profileImage");
+    if (imageEl) {
+      if (data.image) {
+        imageEl.src = data.image;
+        imageEl.style.display = "block";
+      } else {
+        imageEl.style.display = "none";
+      }
+    }
+  } catch (error) {
+    showStatus("dashboardStatus", error.message, true);
+  } finally {
+    setLoader("dashboardLoader", false);
+  }
 }
 
-/* =========================
-   GLOBAL FUNCTIONS (IMPORTANT)
-========================= */
+async function loadAdmin() {
+  setLoader("adminLoader", true);
+  try {
+    const snapshot = await getDocs(collection(db, "users"));
+    adminUsers = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+    renderUserList(adminUsers);
+  } catch (error) {
+    showStatus("adminStatus", error.message, true);
+  } finally {
+    setLoader("adminLoader", false);
+  }
+}
 
-window.login = login;
+function renderUserList(users) {
+  const list = byId("userList");
+  if (!list) return;
+  list.innerHTML = "";
+
+  if (!users.length) {
+    list.innerHTML = "<p class='empty'>No users found.</p>";
+    return;
+  }
+
+  users.forEach((user) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "list-item";
+    button.textContent = user.name ? user.name + " (" + user.id + ")" : user.id;
+    button.onclick = () => selectUser(user);
+    list.appendChild(button);
+  });
+}
+
+function selectUser(user) {
+  adminSelectedId = user.id;
+  byId("adminName").value = user.id || "";
+  byId("adminDisplayName").value = user.name || "";
+  byId("adminMessage").value = user.message || "";
+  byId("adminImage").value = user.image || "";
+  byId("adminAdviser").value = user.adviser || "";
+  byId("adminSection").value = user.section || "";
+  showStatus("adminStatus", "Editing " + (user.name || user.id) + ".", false);
+}
+
+function clearAdminForm() {
+  adminSelectedId = null;
+  const fields = [
+    "adminName",
+    "adminDisplayName",
+    "adminMessage",
+    "adminImage",
+    "adminAdviser",
+    "adminSection"
+  ];
+  fields.forEach((id) => {
+    const el = byId(id);
+    if (el) el.value = "";
+  });
+  showStatus("adminStatus", "", false);
+}
+
+async function saveUser() {
+  const rawId = byId("adminName").value;
+  const id = normalizeName(rawId);
+  if (!id) {
+    showStatus("adminStatus", "Name is required.", true);
+    return;
+  }
+
+  const payload = {
+    name: byId("adminDisplayName").value.trim() || rawId.trim(),
+    message: byId("adminMessage").value.trim(),
+    image: byId("adminImage").value.trim(),
+    adviser: byId("adminAdviser").value.trim(),
+    section: byId("adminSection").value.trim()
+  };
+
+  setLoader("adminLoader", true);
+  try {
+    await setDoc(doc(db, "users", id), payload, { merge: true });
+    showStatus("adminStatus", "User saved.", false);
+    await loadAdmin();
+    const saved = adminUsers.find((user) => user.id === id);
+    if (saved) selectUser(saved);
+  } catch (error) {
+    showStatus("adminStatus", error.message, true);
+  } finally {
+    setLoader("adminLoader", false);
+  }
+}
+
+async function deleteUser() {
+  const rawId = byId("adminName").value;
+  const id = normalizeName(rawId);
+  if (!id) {
+    showStatus("adminStatus", "Select a user to delete.", true);
+    return;
+  }
+
+  setLoader("adminLoader", true);
+  try {
+    await deleteDoc(doc(db, "users", id));
+    showStatus("adminStatus", "User deleted.", false);
+    clearAdminForm();
+    await loadAdmin();
+  } catch (error) {
+    showStatus("adminStatus", error.message, true);
+  } finally {
+    setLoader("adminLoader", false);
+  }
+}
+
+function filterUsers() {
+  const query = byId("adminSearch").value.trim().toLowerCase();
+  const filtered = adminUsers.filter((user) => {
+    const name = (user.name || "").toLowerCase();
+    return user.id.includes(query) || name.includes(query);
+  });
+  renderUserList(filtered);
+}
+
+window.loginByName = loginByName;
 window.logout = logout;
-window.loadTeachers = loadTeachers;
-window.addTeacher = addTeacher;
-window.loadSelectedTeacherMessage = loadSelectedTeacherMessage;
-window.updateMessage = updateMessage;
-window.loadTeacherMessage = loadTeacherMessage;
-window.openEnvelope = openEnvelope;
-window.closeEnvelope = closeEnvelope;
-window.downloadLetter = downloadLetter;
+window.loadDashboard = loadDashboard;
+window.loadAdmin = loadAdmin;
+window.saveUser = saveUser;
+window.deleteUser = deleteUser;
+window.clearAdminForm = clearAdminForm;
+window.filterUsers = filterUsers;
