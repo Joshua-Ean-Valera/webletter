@@ -100,16 +100,10 @@ async function loadDashboard() {
     if (welcomeName) welcomeName.textContent = displayName;
 
     const welcomeMeta = byId("welcomeMeta");
-    if (welcomeMeta) welcomeMeta.textContent = data.section ? data.section : "";
+    if (welcomeMeta) welcomeMeta.textContent = "";
 
     const messageText = byId("messageText");
     if (messageText) messageText.textContent = data.message || "";
-
-    const adviserText = byId("adviserText");
-    if (adviserText) adviserText.textContent = data.adviser || "-";
-
-    const sectionText = byId("sectionText");
-    if (sectionText) sectionText.textContent = data.section || "-";
 
     const imageEl = byId("profileImage");
     if (imageEl) {
@@ -201,8 +195,6 @@ function selectUser(user) {
   byId("adminDisplayName").value = user.name || "";
   byId("adminMessage").value = user.message || "";
   byId("adminImage").value = user.image || "";
-  byId("adminAdviser").value = user.adviser || "";
-  byId("adminSection").value = user.section || "";
   showStatus("adminStatus", "Editing " + (user.name || user.id) + ".", false);
 }
 
@@ -212,9 +204,7 @@ function clearAdminForm() {
     "adminName",
     "adminDisplayName",
     "adminMessage",
-    "adminImage",
-    "adminAdviser",
-    "adminSection"
+    "adminImage"
   ];
   fields.forEach((id) => {
     const el = byId(id);
@@ -234,9 +224,7 @@ async function saveUser() {
   const payload = {
     name: byId("adminDisplayName").value.trim() || rawId.trim(),
     message: byId("adminMessage").value.trim(),
-    image: byId("adminImage").value.trim(),
-    adviser: byId("adminAdviser").value.trim(),
-    section: byId("adminSection").value.trim()
+    image: byId("adminImage").value.trim()
   };
 
   setLoader("adminLoader", true);
