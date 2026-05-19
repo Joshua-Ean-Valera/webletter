@@ -1,5 +1,5 @@
-console.log("SCRIPT IS LOADED");
-alert("SCRIPT LOADED");
+// console.log("SCRIPT IS LOADED");
+// alert("SCRIPT LOADED");
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
@@ -24,6 +24,7 @@ import {
    FIREBASE CONFIG
 ========================= */
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyChlqPz19QeeImmQSt4oWdAluD6XbWch8g",
   authDomain: "webletter-7f64a.firebaseapp.com",
@@ -34,10 +35,7 @@ const firebaseConfig = {
   appId: "1:316842154834:web:e88b9335861ca97f8f388b"
 };
 
-/* =========================
-   INIT
-========================= */
-
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
