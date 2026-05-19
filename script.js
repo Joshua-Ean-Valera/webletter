@@ -193,9 +193,29 @@ async function loadTeacherMessage() {
   const snap = await getDoc(doc(db, "messages", email));
 
   if (snap.exists()) {
-    document.getElementById("teacherMessage").innerText =
-      snap.data().message;
+    const msg = snap.data().message || "";
+    const el = document.getElementById("teacherMessage");
+    if (el) el.innerText = msg;
+    // make sure envelope starts closed
+    const env = document.getElementById('envelope');
+    if (env) env.classList.remove('open');
   }
+}
+
+function openEnvelope(){
+  const env = document.getElementById('envelope');
+  const btn = document.getElementById('openBtn');
+  if (!env) return;
+  env.classList.add('open');
+  if (btn) btn.disabled = true;
+}
+
+function closeEnvelope(){
+  const env = document.getElementById('envelope');
+  const btn = document.getElementById('openBtn');
+  if (!env) return;
+  env.classList.remove('open');
+  if (btn) btn.disabled = false;
 }
 
 /* =========================
@@ -209,3 +229,5 @@ window.addTeacher = addTeacher;
 window.loadSelectedTeacherMessage = loadSelectedTeacherMessage;
 window.updateMessage = updateMessage;
 window.loadTeacherMessage = loadTeacherMessage;
+window.openEnvelope = openEnvelope;
+window.closeEnvelope = closeEnvelope;

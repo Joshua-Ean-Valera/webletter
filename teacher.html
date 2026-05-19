@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Teacher Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Teacher Letter</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -11,19 +13,26 @@
 
   <h1>Teacher Dashboard</h1>
 
-  <button onclick="logout()">
-    Logout
-  </button>
+  <div style="display:flex;gap:10px;justify-content:center;align-items:center;">
+    <button onclick="logout()">Logout</button>
+    <button id="openBtn" onclick="openEnvelope()">Open Letter</button>
+  </div>
 
   <hr>
 
   <h3 id="teacherEmail"></h3>
 
-  <div id="teacherMessage"></div>
+  <div class="envelope-wrap">
+    <div id="envelope" class="envelope">
+      <div class="flap"></div>
+      <div class="body">
+        <div class="letter" id="teacherMessage">Loading message...</div>
+      </div>
+    </div>
+  </div>
 
 </div>
 
-<!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script> -->
 <script type="module" src="script.js"></script>
 
 </body>
