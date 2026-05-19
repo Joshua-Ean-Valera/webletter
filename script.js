@@ -13,7 +13,6 @@ import { adminPassword, firebaseConfig } from "./config.js";
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const SESSION_KEY = "pm_username";
-const ADMIN_KEY = "pm_admin_auth";
 
 let adminUsers = [];
 let adminSelectedId = null;
@@ -135,12 +134,6 @@ function initAdmin() {
     return;
   }
 
-  if (localStorage.getItem(ADMIN_KEY) === "true") {
-    gate.style.display = "none";
-    loadAdminData();
-    return;
-  }
-
   gate.style.display = "flex";
   gate.setAttribute("aria-hidden", "false");
   showStatus("adminGateStatus", "", false);
@@ -161,7 +154,6 @@ function unlockAdmin() {
     return;
   }
 
-  localStorage.setItem(ADMIN_KEY, "true");
   const gate = byId("adminGate");
   if (gate) {
     gate.style.display = "none";
