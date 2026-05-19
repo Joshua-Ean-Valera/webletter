@@ -15,10 +15,10 @@ const db = getFirestore(app);
 const SESSION_KEY = "pm_username";
 
 const nameAliases = {
-  "marikae": "maam kaela",
-  "kaela": "maam kaela",
-  "marie": "maam kaela",
-  "kaela marie": "maam kaela"
+  "marikae": "kaela",
+  "kaela": "kaela",
+  "marie": "kaela",
+  "kaela marie": "kaela"
 };
 
 let adminUsers = [];
