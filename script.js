@@ -36,6 +36,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const adminDisplayName = "Joshua Ean";
 
 /* =========================
    LOGIN
@@ -100,7 +101,7 @@ async function loadTeachers() {
     if (data.role === "teacher") {
       const option = document.createElement("option");
       option.value = data.email;
-      option.textContent = data.email;
+      option.textContent = data.name || data.email;
       select.appendChild(option);
     }
   });
@@ -115,6 +116,7 @@ async function loadTeachers() {
 async function addTeacher() {
 
   const email = document.getElementById("newTeacherEmail").value;
+  const name = document.getElementById("newTeacherName").value;
   const password = document.getElementById("newTeacherPassword").value;
 
   try {
@@ -123,11 +125,14 @@ async function addTeacher() {
 
     await setDoc(doc(db, "users", email), {
       email,
+      name,
       role: "teacher"
     });
 
     await setDoc(doc(db, "messages", email), {
       teacher_email: email,
+      teacher_name: name,
+      admin_name: adminDisplayName,
       message: "No message yet."
     });
 
@@ -203,12 +208,17 @@ async function loadTeacherMessage() {
   }
 
   const snap = await getDoc(doc(db, "messages", email));
+  const userSnap = await getDoc(doc(db, "users", email));
+
+  const teacherName = userSnap.exists() && userSnap.data().name
+    ? userSnap.data().name
+    : email;
 
   if (snap.exists()) {
     const msg = snap.data().message || "";
     const el = document.getElementById("teacherMessage");
     if (el) {
-      el.innerText = "Dear Teacher,\n\n" + msg + "\n\nSincerely,\n" + (email || "");
+      el.innerText = "Dear Teacher,\n\n" + msg + "\n\nSincerely,\n" + teacherName;
     }
   }
 }
