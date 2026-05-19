@@ -14,6 +14,13 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const SESSION_KEY = "pm_username";
 
+const nameAliases = {
+  "marikae": "maam kaela",
+  "kaela": "maam kaela",
+  "marie": "maam kaela",
+  "kaela marie": "maam kaela"
+};
+
 let adminUsers = [];
 let adminSelectedId = null;
 
@@ -23,6 +30,10 @@ function byId(id) {
 
 function normalizeName(value) {
   return value.trim().toLowerCase();
+}
+
+function resolveLoginId(normalizedName) {
+  return nameAliases[normalizedName] || normalizedName;
 }
 
 function showStatus(elementId, message, isError) {
@@ -43,6 +54,7 @@ async function loginByName() {
   if (!nameInput) return;
   const rawName = nameInput.value;
   const normalized = normalizeName(rawName);
+  const loginId = resolveLoginId(normalized);
 
   if (!normalized) {
     showStatus("loginStatus", "Please enter your name.", true);
@@ -53,14 +65,17 @@ async function loginByName() {
   setLoader("authLoader", true);
 
   try {
-    const userSnap = await getDoc(doc(db, "users", normalized));
+    let userSnap = await getDoc(doc(db, "users", loginId));
+    if (!userSnap.exists() && loginId !== normalized) {
+      userSnap = await getDoc(doc(db, "users", normalized));
+    }
     if (!userSnap.exists()) {
       showStatus("loginStatus", "No personalized message found.", true);
       setLoader("authLoader", false);
       return;
     }
 
-    localStorage.setItem(SESSION_KEY, normalized);
+    localStorage.setItem(SESSION_KEY, userSnap.id);
     localStorage.setItem("pm_displayName", userSnap.data().name || rawName.trim());
     window.location.href = "dashboard.html";
   } catch (error) {
