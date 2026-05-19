@@ -278,6 +278,9 @@ body.teacher-page .teacher-shell{
   line-height:1.6;
   color:#212529;
   font-family: "Georgia", "Times New Roman", serif;
+  max-width:100%;
+  overflow-wrap:anywhere;
+  word-break:break-word;
 }
 
 .letter-page__footer{
