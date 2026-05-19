@@ -193,10 +193,7 @@ async function loadTeacherMessage() {
 
   const email = localStorage.getItem("email");
 
-  const teacherEmailEl = document.getElementById("teacherEmail");
-  if (teacherEmailEl) {
-    teacherEmailEl.innerText = email || "Unknown sender";
-  }
+  const senderNameEl = document.getElementById("senderName");
 
   const teacherDateEl = document.getElementById("teacherDate");
   if (teacherDateEl) {
@@ -214,11 +211,19 @@ async function loadTeacherMessage() {
     ? userSnap.data().name
     : email;
 
+  const senderName = snap.exists() && snap.data().admin_name
+    ? snap.data().admin_name
+    : adminDisplayName;
+
+  if (senderNameEl) {
+    senderNameEl.innerText = senderName;
+  }
+
   if (snap.exists()) {
     const msg = snap.data().message || "";
     const el = document.getElementById("teacherMessage");
     if (el) {
-      el.innerText = "Dear Teacher,\n\n" + msg + "\n\nSincerely,\n" + teacherName;
+      el.innerText = "Dear " + (teacherName || "Teacher") + ",\n\n" + msg + "\n\nSincerely,\n" + senderName;
     }
   }
 }
@@ -246,12 +251,12 @@ function closeEnvelope(){
 }
 
 function downloadLetter(){
-  const teacherEmail = document.getElementById("teacherEmail")?.innerText || "Teacher";
+  const senderName = document.getElementById("senderName")?.innerText || adminDisplayName;
   const teacherDate = document.getElementById("teacherDate")?.innerText || "";
   const letter = document.getElementById("teacherMessage")?.innerText || "";
   const blob = new Blob([
     "Appreciation Letter\n\n",
-    "From: ", teacherEmail, "\n",
+    "From: ", senderName, "\n",
     "Date: ", teacherDate, "\n\n",
     letter, "\n"
   ], { type: "text/plain;charset=utf-8" });
