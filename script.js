@@ -243,7 +243,7 @@ async function saveUser() {
   try {
     await setDoc(doc(db, "users", id), payload, { merge: true });
     showStatus("adminStatus", "User saved.", false);
-    await loadAdmin();
+    await loadAdminData();
     const saved = adminUsers.find((user) => user.id === id);
     if (saved) selectUser(saved);
   } catch (error) {
@@ -266,7 +266,7 @@ async function deleteUser() {
     await deleteDoc(doc(db, "users", id));
     showStatus("adminStatus", "User deleted.", false);
     clearAdminForm();
-    await loadAdmin();
+    await loadAdminData();
   } catch (error) {
     showStatus("adminStatus", error.message, true);
   } finally {
