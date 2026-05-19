@@ -8,11 +8,12 @@ import {
   getFirestore,
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-import { adminPassword, firebaseConfig } from "./config.js";
+import { firebaseConfig } from "./config.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const SESSION_KEY = "pm_username";
+const ADMIN_TOKEN_KEY = "pm_admin_token";
 
 const nameAliases = {
   "marikae": "kaela",
@@ -88,6 +89,7 @@ async function loginByName() {
 function logout() {
   localStorage.removeItem(SESSION_KEY);
   localStorage.removeItem("pm_displayName");
+  sessionStorage.removeItem(ADMIN_TOKEN_KEY);
   window.location.href = "index.html";
 }
 
@@ -146,9 +148,11 @@ function initAdmin() {
   gate.style.display = "flex";
   gate.setAttribute("aria-hidden", "false");
   showStatus("adminGateStatus", "", false);
+
+  verifyAdminToken();
 }
 
-function unlockAdmin() {
+async function unlockAdmin() {
   const input = byId("adminPasswordInput");
   if (!input) return;
   const value = input.value.trim();
@@ -158,17 +162,69 @@ function unlockAdmin() {
     return;
   }
 
-  if (value !== adminPassword) {
-    showStatus("adminGateStatus", "Incorrect password.", true);
-    return;
-  }
+  showStatus("adminGateStatus", "Checking password...", false);
 
+  try {
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: value })
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      throw new Error(errorBody.error || "Incorrect password.");
+    }
+
+    const data = await response.json();
+    if (!data.token) {
+      throw new Error("Missing token response.");
+    }
+
+    sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+    unlockAdminUi();
+    await loadAdminData();
+  } catch (error) {
+    showStatus("adminGateStatus", error.message, true);
+  }
+}
+
+async function verifyAdminToken() {
+  const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+  if (!token) return;
+
+  try {
+    const response = await fetch("/api/admin/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    if (!response.ok) {
+      sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+      return;
+    }
+
+    const data = await response.json();
+    if (data.valid) {
+      unlockAdminUi();
+      await loadAdminData();
+    } else {
+      sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    }
+  } catch (error) {
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+  }
+}
+
+function unlockAdminUi() {
   const gate = byId("adminGate");
   if (gate) {
     gate.style.display = "none";
     gate.setAttribute("aria-hidden", "true");
   }
-  loadAdminData();
 }
 
 async function loadAdminData() {
