@@ -12,34 +12,15 @@
 <main class="teacher-shell">
   <section class="letter-page">
     <header class="letter-page__header">
-      <a class="letter-page__back" href="index.html">← Back to Dashboard</a>
       <div class="letter-page__title-wrap">
         <h1 class="letter-page__title">Appreciation Letter</h1>
         <span class="letter-page__underline"></span>
       </div>
-      <button class="letter-page__download" onclick="downloadLetter()">Download PDF</button>
     </header>
-
-    <div class="letter-page__meta">
-      <div class="letter-page__meta-block letter-page__meta-block--from">
-        <span class="letter-page__meta-label">From</span>
-        <strong id="senderName" class="letter-page__meta-value">Loading...</strong>
-      </div>
-      <div class="letter-page__meta-block letter-page__meta-block--date">
-        <span class="letter-page__meta-label">Date</span>
-        <strong id="teacherDate" class="letter-page__meta-value">Loading...</strong>
-      </div>
-    </div>
 
     <article class="letter-page__paper">
       <div class="letter-page__content" id="teacherMessage">Loading message...</div>
     </article>
-
-    <footer class="letter-page__footer">
-      <button class="letter-page__pager letter-page__pager--ghost" type="button" disabled>← Previous Letter</button>
-      <span class="letter-page__count">1 of 1</span>
-      <button class="letter-page__pager" type="button" disabled>Next Letter →</button>
-    </footer>
   </section>
 </main>
 
