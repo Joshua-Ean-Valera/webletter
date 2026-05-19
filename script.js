@@ -196,9 +196,6 @@ async function loadTeacherMessage() {
     const msg = snap.data().message || "";
     const el = document.getElementById("teacherMessage");
     if (el) el.innerText = msg;
-    // make sure envelope starts closed
-    const env = document.getElementById('envelope');
-    if (env) env.classList.remove('open');
   }
 }
 
@@ -206,8 +203,14 @@ function openEnvelope(){
   const env = document.getElementById('envelope');
   const btn = document.getElementById('openBtn');
   if (!env) return;
+  if (env.classList.contains('open')) {
+    env.classList.remove('open');
+    if (btn) btn.textContent = 'Open Letter';
+    return;
+  }
+
   env.classList.add('open');
-  if (btn) btn.disabled = true;
+  if (btn) btn.textContent = 'Close Letter';
 }
 
 function closeEnvelope(){
@@ -215,7 +218,7 @@ function closeEnvelope(){
   const btn = document.getElementById('openBtn');
   if (!env) return;
   env.classList.remove('open');
-  if (btn) btn.disabled = false;
+  if (btn) btn.textContent = 'Open Letter';
 }
 
 /* =========================
