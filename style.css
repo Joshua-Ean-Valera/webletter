@@ -222,6 +222,13 @@ img{
   color:#1d2939;
 }
 
+/* Teacher letter text alignment */
+.letter-page__content{
+  text-align:left;
+  max-width:72ch;
+  margin:0 auto;
+}
+
 .detail-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
