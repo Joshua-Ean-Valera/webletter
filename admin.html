@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="admin-page" onload="loadAdmin()">
+<body class="admin-page" onload="initAdmin()">
 
   <main class="admin-shell">
     <header class="dashboard-header">
@@ -86,6 +86,21 @@
 
   <div id="adminLoader" class="loader" aria-hidden="true">
     <span class="spinner"></span>
+  </div>
+
+  <div id="adminGate" class="admin-gate" aria-hidden="true">
+    <div class="glass-card admin-gate__card">
+      <h2 class="section-title">Admin Access</h2>
+      <p class="dashboard-meta">Enter the admin password to continue.</p>
+      <form onsubmit="unlockAdmin(); return false;">
+        <label class="field">
+          <span>Password</span>
+          <input id="adminPasswordInput" type="password" placeholder="Admin password">
+        </label>
+        <button class="btn btn-primary" type="submit">Unlock</button>
+        <p id="adminGateStatus" class="form-status" aria-live="polite"></p>
+      </form>
+    </div>
   </div>
 
   <script type="module" src="script.js"></script>

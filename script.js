@@ -8,11 +8,12 @@ import {
   getFirestore,
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-import { firebaseConfig } from "./config.js";
+import { adminPassword, firebaseConfig } from "./config.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const SESSION_KEY = "pm_username";
+const ADMIN_KEY = "pm_admin_auth";
 
 let adminUsers = [];
 let adminSelectedId = null;
@@ -127,7 +128,49 @@ async function loadDashboard() {
   }
 }
 
-async function loadAdmin() {
+function initAdmin() {
+  const gate = byId("adminGate");
+  if (!gate) {
+    loadAdminData();
+    return;
+  }
+
+  if (localStorage.getItem(ADMIN_KEY) === "true") {
+    gate.style.display = "none";
+    loadAdminData();
+    return;
+  }
+
+  gate.style.display = "flex";
+  gate.setAttribute("aria-hidden", "false");
+  showStatus("adminGateStatus", "", false);
+}
+
+function unlockAdmin() {
+  const input = byId("adminPasswordInput");
+  if (!input) return;
+  const value = input.value.trim();
+
+  if (!value) {
+    showStatus("adminGateStatus", "Enter the admin password.", true);
+    return;
+  }
+
+  if (value !== adminPassword) {
+    showStatus("adminGateStatus", "Incorrect password.", true);
+    return;
+  }
+
+  localStorage.setItem(ADMIN_KEY, "true");
+  const gate = byId("adminGate");
+  if (gate) {
+    gate.style.display = "none";
+    gate.setAttribute("aria-hidden", "true");
+  }
+  loadAdminData();
+}
+
+async function loadAdminData() {
   setLoader("adminLoader", true);
   try {
     const snapshot = await getDocs(collection(db, "users"));
@@ -251,7 +294,8 @@ function filterUsers() {
 window.loginByName = loginByName;
 window.logout = logout;
 window.loadDashboard = loadDashboard;
-window.loadAdmin = loadAdmin;
+window.initAdmin = initAdmin;
+window.unlockAdmin = unlockAdmin;
 window.saveUser = saveUser;
 window.deleteUser = deleteUser;
 window.clearAdminForm = clearAdminForm;

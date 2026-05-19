@@ -224,6 +224,22 @@ img{
   gap:24px;
 }
 
+.admin-gate{
+  position:fixed;
+  inset:0;
+  background:rgba(16, 24, 40, 0.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:100;
+  padding:24px;
+}
+
+.admin-gate__card{
+  width:min(420px, 100%);
+  text-align:left;
+}
+
 .admin-toolbar{
   display:flex;
   justify-content:space-between;

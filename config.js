@@ -7,3 +7,5 @@ export const firebaseConfig = {
   messagingSenderId: "316842154834",
   appId: "1:316842154834:web:e88b9335861ca97f8f388b"
 };
+
+export const adminPassword = "CHANGE_ME";
