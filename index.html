@@ -10,21 +10,25 @@
 
   <h1>Faculty Messaging System</h1>
 
-  <input
-    type="email"
-    id="email"
-    placeholder="Email"
-  >
+  <form onsubmit="login(); return false;">
 
-  <input
-    type="password"
-    id="password"
-    placeholder="Password"
-  >
+    <input
+      type="email"
+      id="email"
+      placeholder="Email"
+    >
 
-  <button onclick="login()">
-    Login
-  </button>
+    <input
+      type="password"
+      id="password"
+      placeholder="Password"
+    >
+
+    <button type="submit">
+      Login
+    </button>
+
+  </form>
 
 </div>
 
