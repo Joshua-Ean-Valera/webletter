@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Your Message</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-page" onload="loadDashboard()">
+
+  <main class="dashboard-shell">
+    <header class="dashboard-header">
+      <div class="brand">
+        <div class="brand__dot"></div>
+        <span class="brand__name">Personalized Message</span>
+      </div>
+      <button class="btn btn-ghost" onclick="logout()">Logout</button>
+    </header>
+
+    <section class="glass-card dashboard-card">
+      <div class="dashboard-hero">
+        <div>
+          <p class="kicker">Welcome</p>
+          <h1 id="welcomeName" class="dashboard-title">Loading...</h1>
+          <p id="welcomeMeta" class="dashboard-meta">Preparing your message</p>
+        </div>
+        <img id="profileImage" class="profile-image" alt="Profile" />
+      </div>
+
+      <div class="message-card">
+        <div id="messageText" class="message-text">Loading message...</div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Adviser</span>
+          <strong id="adviserText" class="detail-value">-</strong>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Section</span>
+          <strong id="sectionText" class="detail-value">-</strong>
+        </div>
+      </div>
+
+      <div id="dashboardStatus" class="form-status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div id="dashboardLoader" class="loader" aria-hidden="true">
+    <span class="spinner"></span>
+  </div>
+
+  <script type="module" src="script.js"></script>
+
+</body>
+</html>
