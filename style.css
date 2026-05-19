@@ -164,10 +164,22 @@ body.teacher-page .teacher-shell{
 }
 
 .letter-page__header{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:start;
-  gap:16px;
+  position:relative;
+  padding-right:120px;
+}
+
+.letter-page__logout{
+  position:absolute;
+  top:0;
+  right:0;
+  width:auto;
+  padding:10px 14px;
+  margin-top:0;
+  background:#fff;
+  color:#2f6ff1;
+  border:1px solid #3a82ff;
+  border-radius:2px;
+  cursor:pointer;
 }
 
 .letter-page__back,
