@@ -3,35 +3,45 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Teacher Letter</title>
+  <title>Appreciation Letter</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body onload="loadTeacherMessage()">
+<body class="teacher-page" onload="loadTeacherMessage()">
 
-<div class="container">
+<main class="teacher-shell">
+  <section class="letter-page">
+    <header class="letter-page__header">
+      <a class="letter-page__back" href="index.html">← Back to Dashboard</a>
+      <div class="letter-page__title-wrap">
+        <h1 class="letter-page__title">Appreciation Letter</h1>
+        <span class="letter-page__underline"></span>
+      </div>
+      <button class="letter-page__download" onclick="downloadLetter()">Download PDF</button>
+    </header>
 
-  <h1>Teacher Dashboard</h1>
-
-  <div style="display:flex;gap:10px;justify-content:center;align-items:center;">
-    <button onclick="logout()">Logout</button>
-    <button id="openBtn" onclick="openEnvelope()">Open Letter</button>
-  </div>
-
-  <hr>
-
-  <h3 id="teacherEmail"></h3>
-
-  <div class="envelope-wrap">
-    <div id="envelope" class="envelope" style="--env-flap:#e9e9e9; --env-body:#f0f0f0">
-      <div class="flap"></div>
-      <div class="body">
-        <div class="letter" id="teacherMessage">Loading message...</div>
+    <div class="letter-page__meta">
+      <div class="letter-page__meta-block letter-page__meta-block--from">
+        <span class="letter-page__meta-label">From</span>
+        <strong id="teacherEmail" class="letter-page__meta-value">Loading...</strong>
+      </div>
+      <div class="letter-page__meta-block letter-page__meta-block--date">
+        <span class="letter-page__meta-label">Date</span>
+        <strong id="teacherDate" class="letter-page__meta-value">Loading...</strong>
       </div>
     </div>
-  </div>
 
-</div>
+    <article class="letter-page__paper">
+      <div class="letter-page__content" id="teacherMessage">Loading message...</div>
+    </article>
+
+    <footer class="letter-page__footer">
+      <button class="letter-page__pager letter-page__pager--ghost" type="button" disabled>← Previous Letter</button>
+      <span class="letter-page__count">1 of 1</span>
+      <button class="letter-page__pager" type="button" disabled>Next Letter →</button>
+    </footer>
+  </section>
+</main>
 
 <script type="module" src="script.js"></script>
 

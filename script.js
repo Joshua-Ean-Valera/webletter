@@ -188,14 +188,28 @@ async function loadTeacherMessage() {
 
   const email = localStorage.getItem("email");
 
-  document.getElementById("teacherEmail").innerText = email;
+  const teacherEmailEl = document.getElementById("teacherEmail");
+  if (teacherEmailEl) {
+    teacherEmailEl.innerText = email || "Unknown sender";
+  }
+
+  const teacherDateEl = document.getElementById("teacherDate");
+  if (teacherDateEl) {
+    teacherDateEl.innerText = new Date().toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
 
   const snap = await getDoc(doc(db, "messages", email));
 
   if (snap.exists()) {
     const msg = snap.data().message || "";
     const el = document.getElementById("teacherMessage");
-    if (el) el.innerText = msg;
+    if (el) {
+      el.innerText = "Dear Teacher,\n\n" + msg + "\n\nSincerely,\n" + (email || "");
+    }
   }
 }
 
@@ -221,6 +235,25 @@ function closeEnvelope(){
   if (btn) btn.textContent = 'Open Letter';
 }
 
+function downloadLetter(){
+  const teacherEmail = document.getElementById("teacherEmail")?.innerText || "Teacher";
+  const teacherDate = document.getElementById("teacherDate")?.innerText || "";
+  const letter = document.getElementById("teacherMessage")?.innerText || "";
+  const blob = new Blob([
+    "Appreciation Letter\n\n",
+    "From: ", teacherEmail, "\n",
+    "Date: ", teacherDate, "\n\n",
+    letter, "\n"
+  ], { type: "text/plain;charset=utf-8" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "appreciation-letter.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 /* =========================
    GLOBAL FUNCTIONS (IMPORTANT)
 ========================= */
@@ -234,3 +267,4 @@ window.updateMessage = updateMessage;
 window.loadTeacherMessage = loadTeacherMessage;
 window.openEnvelope = openEnvelope;
 window.closeEnvelope = closeEnvelope;
+window.downloadLetter = downloadLetter;

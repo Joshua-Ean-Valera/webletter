@@ -137,3 +137,191 @@ button:hover{
 .compose input,.compose select,.compose textarea{width:100%;padding:10px;margin-top:8px;border-radius:6px;border:1px solid #ddd;box-sizing:border-box}
 .compose textarea{resize:vertical}
 .compose label{color:#333}
+
+/* Teacher letter page */
+body.teacher-page{
+  display:block;
+  min-height:100vh;
+  padding:24px;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.95), rgba(244,247,255,0.85) 36%, rgba(239,242,250,0.92) 100%),
+    linear-gradient(135deg, #f7f9ff 0%, #eef3ff 100%);
+  overflow-x:hidden;
+}
+
+body.teacher-page .teacher-shell{
+  width:min(760px, calc(100vw - 32px));
+  margin:0 auto;
+}
+
+.letter-page{
+  background:rgba(255,255,255,0.92);
+  border:1px solid rgba(210,219,241,0.9);
+  border-radius:14px;
+  box-shadow:0 18px 60px rgba(60,79,120,0.14);
+  padding:20px 24px 26px;
+  backdrop-filter: blur(8px);
+}
+
+.letter-page__header{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:start;
+  gap:16px;
+}
+
+.letter-page__back,
+.letter-page__download,
+.letter-page__pager{
+  appearance:none;
+  border:1px solid #3a82ff;
+  color:#2f6ff1;
+  background:transparent;
+  text-decoration:none;
+  border-radius:2px;
+  padding:10px 14px;
+  font-size:14px;
+  line-height:1;
+  cursor:pointer;
+  transition:transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.letter-page__back:hover,
+.letter-page__download:hover,
+.letter-page__pager:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(58,130,255,0.12);
+}
+
+.letter-page__download,
+.letter-page__pager{
+  background:#fff;
+}
+
+.letter-page__pager--ghost{
+  opacity:.85;
+}
+
+.letter-page__title-wrap{
+  text-align:center;
+  padding-top:2px;
+}
+
+.letter-page__title{
+  margin:0;
+  font-size:26px;
+  line-height:1.1;
+  color:#17191d;
+  font-weight:700;
+  letter-spacing:-0.02em;
+}
+
+.letter-page__underline{
+  display:block;
+  width:70px;
+  height:3px;
+  margin:10px auto 0;
+  border-radius:999px;
+  background:linear-gradient(90deg, #2f6ff1, #4aa3ff);
+}
+
+.letter-page__meta{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:22px;
+}
+
+.letter-page__meta-block{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  background:linear-gradient(180deg, rgba(245,249,255,0.95), rgba(237,243,255,0.9));
+  border-radius:2px;
+  padding:18px 22px;
+  min-height:76px;
+  border:1px solid rgba(212,224,247,0.95);
+}
+
+.letter-page__meta-block--from{
+  align-items:flex-start;
+}
+
+.letter-page__meta-block--date{
+  align-items:center;
+  justify-content:center;
+}
+
+.letter-page__meta-label{
+  font-size:14px;
+  color:#5f6b83;
+}
+
+.letter-page__meta-value{
+  font-size:16px;
+  color:#1b1f29;
+  font-weight:600;
+}
+
+.letter-page__paper{
+  margin-top:18px;
+  background:#fff;
+  border:1px solid #e8ebf1;
+  box-shadow:0 2px 10px rgba(21, 31, 58, 0.05);
+  padding:26px 30px 30px;
+  min-height:320px;
+}
+
+.letter-page__content{
+  white-space:pre-wrap;
+  font-size:18px;
+  line-height:1.6;
+  color:#212529;
+  font-family: "Georgia", "Times New Roman", serif;
+}
+
+.letter-page__footer{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:18px;
+  margin-top:24px;
+}
+
+.letter-page__count{
+  text-align:center;
+  font-size:15px;
+  color:#3f4655;
+}
+
+@media (max-width: 720px){
+  body.teacher-page{padding:14px}
+
+  .letter-page{padding:16px}
+
+  .letter-page__header,
+  .letter-page__footer,
+  .letter-page__meta{
+    grid-template-columns:1fr;
+  }
+
+  .letter-page__title-wrap{
+    order:-1;
+  }
+
+  .letter-page__back,
+  .letter-page__download,
+  .letter-page__pager{
+    width:100%;
+    text-align:center;
+    justify-content:center;
+  }
+
+  .letter-page__paper{
+    padding:22px 18px 24px;
+  }
+
+  .letter-page__content{
+    font-size:17px;
+  }
+}
