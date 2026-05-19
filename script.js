@@ -218,6 +218,51 @@ function closeEnvelope(){
   if (btn) btn.disabled = false;
 }
 
+function previewLetter(){
+  const to = document.getElementById('toName').value || '';
+  const from = document.getElementById('fromName').value || '';
+  const msg = document.getElementById('messageInput').value || '';
+  const color = document.getElementById('colorSelect').value || '#e9e9e9';
+
+  const letterEl = document.getElementById('teacherMessage');
+  if (letterEl){
+    let text = '';
+    if (to) text += 'To: ' + to + "\n\n";
+    text += msg + "\n\n";
+    if (from) text += '— ' + from;
+    letterEl.innerText = text;
+  }
+
+  const env = document.getElementById('envelope');
+  if (env){
+    // set CSS variables for colors
+    env.style.setProperty('--env-flap', color);
+    // use a slightly lighter body color
+    env.style.setProperty('--env-body', shadeColor(color, 0.92));
+    // ensure envelope is closed ready for the user to open
+    env.classList.remove('open');
+    const btn = document.getElementById('openBtn');
+    if (btn) btn.disabled = false;
+  }
+}
+
+// simple helper to darken/lighten hex color (factor <1 darkens)
+function shadeColor(hex, factor){
+  try{
+    const c = hex.replace('#','');
+    const num = parseInt(c,16);
+    let r = (num>>16) & 0xFF;
+    let g = (num>>8) & 0xFF;
+    let b = num & 0xFF;
+    r = Math.round(r * factor);
+    g = Math.round(g * factor);
+    b = Math.round(b * factor);
+    return '#' + ((1<<24) + (r<<16) + (g<<8) + b).toString(16).slice(1);
+  }catch(e){
+    return hex;
+  }
+}
+
 /* =========================
    GLOBAL FUNCTIONS (IMPORTANT)
 ========================= */
