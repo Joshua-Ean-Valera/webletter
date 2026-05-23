@@ -180,6 +180,10 @@ img{
   white-space:pre-wrap;
 }
 
+.letter-page__content{
+  white-space:pre-wrap;
+}
+
 .dashboard-title{
   margin:0;
   font-size:26px;
