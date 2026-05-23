@@ -152,6 +152,27 @@ async function loadDashboard() {
   }
 }
 
+async function loadTeacherMessage() {
+  const userId = localStorage.getItem(SESSION_KEY);
+  if (!userId) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  try {
+    const snap = await getDoc(doc(db, "users", userId));
+    if (!snap.exists()) {
+      renderMessageWithIndent("teacherMessage", "No message found.");
+      return;
+    }
+
+    const data = snap.data();
+    renderMessageWithIndent("teacherMessage", data.message || "");
+  } catch (error) {
+    renderMessageWithIndent("teacherMessage", error.message);
+  }
+}
+
 function initAdmin() {
   const gate = byId("adminGate");
   if (!gate) {
@@ -359,6 +380,7 @@ function filterUsers() {
 window.loginByName = loginByName;
 window.logout = logout;
 window.loadDashboard = loadDashboard;
+window.loadTeacherMessage = loadTeacherMessage;
 window.initAdmin = initAdmin;
 window.unlockAdmin = unlockAdmin;
 window.saveUser = saveUser;
