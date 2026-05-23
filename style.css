@@ -177,7 +177,16 @@ img{
 
 .message-text{
   text-align:justify;
+}
+
+.message-paragraph{
+  margin:0 0 12px;
+  text-indent:2em;
   white-space:pre-wrap;
+}
+
+.message-paragraph:last-child{
+  margin-bottom:0;
 }
 
 .letter-page__content{
@@ -299,26 +308,6 @@ img{
   gap:16px;
 }
 
-.message-toolbar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.tool-btn{
-  border:1px solid #d0d5dd;
-  background:#fff;
-  color:#344054;
-  border-radius:999px;
-  padding:6px 12px;
-  font-size:12px;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.tool-btn:hover{
-  border-color:#5b8cff;
-}
 
 .section-title{
   margin:0;

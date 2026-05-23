@@ -50,70 +50,18 @@ function setLoader(id, isVisible) {
   el.style.display = isVisible ? "flex" : "none";
 }
 
-function applyAdminMessageEdit(editFn) {
-  const textarea = byId("adminMessage");
-  if (!textarea) return;
-  const value = textarea.value;
-  const start = textarea.selectionStart || 0;
-  const end = textarea.selectionEnd || 0;
-  const result = editFn(value, start, end);
-  if (!result) return;
-  textarea.value = result.value;
-  textarea.focus();
-  textarea.setSelectionRange(result.start, result.end);
-}
-
-function indentMessage() {
-  applyAdminMessageEdit((value, start, end) => {
-    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
-    const lineEnd = value.indexOf("\n", end);
-    const endIndex = lineEnd === -1 ? value.length : lineEnd;
-    const block = value.slice(lineStart, endIndex);
-    const indented = block.replace(/^/gm, "  ");
-    const prefixLines = block.split("\n").length;
-    const delta = 2 * prefixLines;
-    return {
-      value: value.slice(0, lineStart) + indented + value.slice(endIndex),
-      start: start + 2,
-      end: end + delta
-    };
-  });
-}
-
-function italicizeMessage() {
-  applyAdminMessageEdit((value, start, end) => {
-    if (start === end) {
-      const insert = "**";
-      return {
-        value: value.slice(0, start) + insert + value.slice(end),
-        start: start + 1,
-        end: start + 1
-      };
-    }
-    const selected = value.slice(start, end);
-    const wrapped = "*" + selected + "*";
-    return {
-      value: value.slice(0, start) + wrapped + value.slice(end),
-      start: start + 1,
-      end: end + 1
-    };
-  });
-}
-
-function bulletMessage() {
-  applyAdminMessageEdit((value, start, end) => {
-    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
-    const lineEnd = value.indexOf("\n", end);
-    const endIndex = lineEnd === -1 ? value.length : lineEnd;
-    const block = value.slice(lineStart, endIndex);
-    const bulleted = block.replace(/^/gm, "- ");
-    const prefixLines = block.split("\n").length;
-    const delta = 2 * prefixLines;
-    return {
-      value: value.slice(0, lineStart) + bulleted + value.slice(endIndex),
-      start: start + 2,
-      end: end + delta
-    };
+function renderMessageWithIndent(elementId, message) {
+  const container = byId(elementId);
+  if (!container) return;
+  container.innerHTML = "";
+  const normalized = (message || "").replace(/\r\n/g, "\n");
+  if (!normalized) return;
+  const paragraphs = normalized.split(/\n\s*\n/);
+  paragraphs.forEach((paragraph) => {
+    const el = document.createElement("p");
+    el.className = "message-paragraph";
+    el.textContent = paragraph;
+    container.appendChild(el);
   });
 }
 
@@ -186,8 +134,7 @@ async function loadDashboard() {
     const welcomeMeta = byId("welcomeMeta");
     if (welcomeMeta) welcomeMeta.textContent = "";
 
-    const messageText = byId("messageText");
-    if (messageText) messageText.textContent = data.message || "";
+    renderMessageWithIndent("messageText", data.message || "");
 
     const imageEl = byId("profileImage");
     if (imageEl) {
@@ -418,6 +365,3 @@ window.saveUser = saveUser;
 window.deleteUser = deleteUser;
 window.clearAdminForm = clearAdminForm;
 window.filterUsers = filterUsers;
-window.indentMessage = indentMessage;
-window.italicizeMessage = italicizeMessage;
-window.bulletMessage = bulletMessage;
