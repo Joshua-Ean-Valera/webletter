@@ -175,6 +175,10 @@ img{
   gap:22px;
 }
 
+.message-text{
+  text-align:justify;
+}
+
 .dashboard-title{
   margin:0;
   font-size:26px;
